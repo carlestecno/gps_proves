@@ -37,7 +37,7 @@ TinyGsm modem(SerialAT);
 // #define NETWORK_APN     "CHN-CT"             //CHN-CT: China Telecom
 
 
-#define SMS_TARGET  "+86xxxxxxx" //Change the number you want to send sms message
+#define SMS_TARGET  "622090133" //Change the number you want to send sms message
 
 
 

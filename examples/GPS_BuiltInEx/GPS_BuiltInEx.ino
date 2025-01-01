@@ -139,9 +139,19 @@ void loopGPS(uint8_t gnss_mode)
             Serial.println(info.isFix);
 
             Serial.print("Latitude:");
-            Serial.println(info.latitude, 6);
+            Serial.print(info.latitude, 7);
+            if (info.latitude > 0){
+                Serial.println(" N");
+            } else {
+                Serial.println(" S");
+            }
             Serial.print("Longitude:");
-            Serial.println(info.longitude, 6);
+            Serial.print(info.longitude, 7);
+            if (info.longitude > 0){
+                Serial.println(" E");
+            } else {
+                Serial.println(" W");
+            }
             Serial.print("Speed:");
             Serial.println(info.speed);
             Serial.print("Altitude:");
