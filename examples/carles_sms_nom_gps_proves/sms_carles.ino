@@ -25,6 +25,7 @@
 #define TINY_GSM_DEBUG SerialMon
 
 #include <TinyGsmClient.h>
+#include <ArduinoHttpClient.h>
 
 //define SMS_TARGET  "+34622090133"
 const char* ssid = "Banyoles-Servidor";
@@ -38,6 +39,18 @@ WiFiServer server(80);
 const char apn[]      = "internet";
 const char gprsUser[] = "";
 const char gprsPass[] = "";
+
+// Server details
+const char serverFirebase[]   = "35.205.133.210";
+const char resource[]         = "/submit_data01.php";
+const int  port               = 80;
+
+#if TINY_GSM_USE_GPRS && not defined TINY_GSM_MODEM_HAS_GPRS
+#undef TINY_GSM_USE_GPRS
+#undef TINY_GSM_USE_WIFI
+#define TINY_GSM_USE_GPRS false
+#define TINY_GSM_USE_WIFI true
+#endif
 
 int flag = 0;
 
@@ -119,6 +132,9 @@ TinyGsm modem(debugger);
 #else
 TinyGsm modem(SerialAT);
 #endif
+
+TinyGsmClient client(modem);
+HttpClient    http(client, serverFirebase, port);
 
 
 bool sms_enviat = false;
@@ -349,6 +365,35 @@ void setup()
     Serial.println(res_one ? "OK" : "fail");
     Serial.print("Send sms_two message ");
     Serial.println(res_two ? "OK" : "fail");
+
+    DBG("Initializing modem...");
+    if (!modem.init()) {
+        DBG("Failed to restart modem, delaying 10s and retrying");
+        return;
+    }
+
+    Serial.print("Waiting for network...");
+    while (!modem.waitForNetwork()){
+      Serial.print(".");
+      delay(1000);
+    }
+    Serial.println("Network connected");
+    
+#if TINY_GSM_USE_GPRS
+    // GPRS connection parameters are usually set after network registration
+    Serial.print(F("Connecting to "));
+    Serial.print(apn);
+    if (!modem.gprsConnect(apn, gprsUser, gprsPass)) {
+        Serial.println(" fail");
+        delay(10000);
+        return;
+    }
+    Serial.println(" success");
+
+    if (modem.isGprsConnected()) {
+        Serial.println("GPRS connected");
+    }
+#endif
 
     Serial.println("Enabling GPS/GNSS/GLONASS");
     while (!modem.enableGPS(MODEM_GPS_ENABLE_GPIO, MODEM_GPS_ENABLE_LEVEL)) {
