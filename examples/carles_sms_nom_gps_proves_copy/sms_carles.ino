@@ -114,6 +114,9 @@ String decodeURIComponent(const String& encoded) {
 // set GSM PIN, if any
 #define GSM_PIN ""
 
+// Set serial for debug console (to the Serial Monitor, default speed 115200)
+#define SerialMon Serial
+
 // See all AT commands, if wanted
 #define DUMP_AT_COMMANDS
 
@@ -159,10 +162,11 @@ char buf[256];
 
 gpsMessage loopGPS()
 {
-
     Serial.println("=========================");
     Serial.print("Set GPS Mode : ");
     Serial.println(1);
+
+    //modem.setGPSMode(1); // modificat últim
 
     GPSInfo info;
     gpsMessage message;
@@ -281,7 +285,7 @@ void setup()
 
 
   // Set ring pin input
-  pinMode(MODEM_RING_PIN, INPUT_PULLUP); // es pot eliminar si no es reben trucades
+  // pinMode(MODEM_RING_PIN, INPUT_PULLUP); es pot eliminar si no es reben trucades
 
   // Set modem baud
   SerialAT.begin(115200, SERIAL_8N1, MODEM_RX_PIN, MODEM_TX_PIN);
@@ -291,9 +295,9 @@ void setup()
 
   
 
-  while (!modem.testAT()) {
+  /* while (!modem.testAT()) {
       delay(10);
-  }
+  } */
 
    // Wait PB DONE
   delay(10000);
@@ -349,18 +353,27 @@ void setup()
     Serial.print("Send sms_two message ");
     Serial.println(res_two ? "OK" : "fail");
 
+
+    // Mirar de canviar el modem.
     DBG("Initializing modem...");
     if (!modem.init()) {
         DBG("Failed to restart modem, delaying 10s and retrying");
         return;
     }
+    //modem.sendAT("AT&F");
 
+    //modem.sendAT("+CRESET");
+    /* modem.sendAT("+CNMP=2");
+    delay(3000); */
     Serial.print("Waiting for network...");
     while (!modem.waitForNetwork()){
       Serial.print(".");
       delay(1000);
     }
     Serial.println("Network connected");
+    
+
+    
     
 #if TINY_GSM_USE_GPRS
     // GPRS connection parameters are usually set after network registration
@@ -375,6 +388,16 @@ void setup()
 
     if (modem.isGprsConnected()) {
         Serial.println("GPRS connected");
+        Serial.println("Checking network mode...");
+        int value = modem.getNetworkMode();
+        Serial.print("value: ");
+        Serial.println(value);
+        String values = modem.getNetworkModes();
+        Serial.print("values: ");
+        Serial.println(values);
+
+        /* modem.sendAT("+CNSMOD?");
+        delay(100); */
     }
 #endif
 
@@ -510,7 +533,8 @@ void loop()
         Serial.print("rssi: " + String(rssi));
         if (rssi > 9 && rssi < 33){
           Serial.println("Bona senyal");
-          bool resPrimer = modem.sendSMS(SMS_TARGET_ONE, String("A5 atrapat - V: ") +  String(battery_voltage));
+          //bool resPrimer = modem.sendSMS(SMS_TARGET_ONE, String("A5 atrapat - V: ") +  String(battery_voltage));
+          bool resPrimer = modem.sendSMS(SMS_TARGET_ONE, deviceName +  String(battery_voltage));
           if (resPrimer){
             Serial.println("sms enviat amb èxit");
             res_one = true;
@@ -529,7 +553,8 @@ void loop()
         Serial.print("rssi: " + String(rssi));
         if (rssi > 9 && rssi < 33){
           Serial.println("Bona senyal");
-          bool resSegon = modem.sendSMS(SMS_TARGET_TWO, String("A5 atrapat - V: ") +  String(battery_voltage));
+          //bool resSegon = modem.sendSMS(SMS_TARGET_TWO, String("A5 atrapat - V: ") +  String(battery_voltage));
+          bool resSegon = modem.sendSMS(SMS_TARGET_ONE, deviceName +  String(battery_voltage));
           if (resSegon){
             Serial.println("sms enviat amb èxit");
             res_two = true;
