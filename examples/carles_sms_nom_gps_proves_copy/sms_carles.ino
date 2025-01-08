@@ -628,15 +628,7 @@ int checkCSQ(){
   }
 }**/
 
-/**void actualitzarLCD(float voltage){
-  //float voltage = voltageSensor.getRmsVoltage();
-  lcd.setCursor(0,1);
-  lcd.print("V:");
-  lcd.setCursor(3,1);
-  lcd.print(voltage);
-  Serial.print("Voltage: ");
-  Serial.println(voltage);
-}**/
+
 /** 
 void connectModem(){
   Serial.println("Connectant mòdem");
