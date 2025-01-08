@@ -13,6 +13,7 @@
 #include <esp_adc_cal.h>
 #include <WiFi.h>
 #include <SPIFFS.h>
+#include "utils.h"
 
 #define INTERRUPTOR_PIN 32 
 
@@ -63,47 +64,7 @@ struct gpsMessage{
   String valorLon;
 };
 
-String decodeURIComponent(const String& encoded) {
-  String decoded = encoded;
-  
-  decoded.replace("%20", " ");  // Espai
-  decoded.replace("%21", "!");  // Exclamació
-  decoded.replace("%22", "\""); // Cometes
-  decoded.replace("%5C", "\\"); // Barra invertida literal
-  decoded.replace("%23", "#");  // Hashtag
-  decoded.replace("%24", "$");  // Dòlar
-  decoded.replace("%25", "%");  // Percentatge
-  decoded.replace("%26", "&");  // Amper
-  decoded.replace("%27", "'");  // Cometes simples
-  decoded.replace("%28", "(");  // Parèntesi esquerre
-  decoded.replace("%29", ")");  // Parèntesi dreta
-  decoded.replace("%2B", "+");  // Suma
-  decoded.replace("%2C", ",");  // Coma
-  decoded.replace("%2F", "/");  // Barra
-  decoded.replace("%3A", ":");  // Dos punts
-  decoded.replace("%3B", ";");  // Punt i coma
-  decoded.replace("%3D", "=");  // Igual
-  decoded.replace("%3F", "?");  // Interrogant
-  decoded.replace("%40", "@");  // Arroba
-  decoded.replace("%C3%A1", "á");  // À
-  decoded.replace("%C3%A9", "é");  // É
-  decoded.replace("%C3%AD", "í");  // Í
-  decoded.replace("%C3%B3", "ó");  // Ó
-  decoded.replace("%C3%BA", "ú");  // Ú
-  decoded.replace("%C3%A0", "à");  // à
-  decoded.replace("%C3%A8", "è");  // è
-  decoded.replace("%C3%B2", "ò");   // ô
-  decoded.replace("%C3%B4", "ô");  // ô
-  decoded.replace("%C3%A7", "ç");  // ç
-  decoded.replace("%C3%80", "À");  // À
-  decoded.replace("%C3%89", "É");  // É
-  decoded.replace("%C3%88", "È");  // È
-  decoded.replace("%C3%92", "Ò");  // Ò
-  decoded.replace("%C3%93", "Ó");  // Ó
-  decoded.replace("%C3%9A", "Ú");  // Ú
 
-  return decoded;
-}
 
 // Define the serial console for debug prints, if needed
 #define TINY_GSM_DEBUG SerialMon
@@ -295,9 +256,9 @@ void setup()
 
   
 
-  /* while (!modem.testAT()) {
+  while (!modem.testAT()) {
       delay(10);
-  } */
+  }
 
    // Wait PB DONE
   delay(10000);
@@ -360,11 +321,7 @@ void setup()
         DBG("Failed to restart modem, delaying 10s and retrying");
         return;
     }
-    //modem.sendAT("AT&F");
 
-    //modem.sendAT("+CRESET");
-    /* modem.sendAT("+CNMP=2");
-    delay(3000); */
     Serial.print("Waiting for network...");
     while (!modem.waitForNetwork()){
       Serial.print(".");
@@ -588,18 +545,12 @@ void loop()
     // acabat de posar per enviar les dades a Firebase.
     if (modem.isGprsConnected()) {
       Serial.println("Enviant dades a Firebase...");
-      //String jsonData = "{\"device\":\"" + deviceName + "\",\"lat\":\"" + testGPS.valorLat + "\",\"lon\":\"" + testGPS.valorLon + "\",\"battery\":\"" + String(battery_voltage) + "\"}";
       String url = "http://34.140.81.157//submit_data01.php?data1=" + data1 + "&data2=" + data2 + "&data3=" + data3 + "&data4=" + String(1);
 
       http.beginRequest();
-      //http.post(resource);
       http.get(url);
       http.endRequest();
-      /* http.sendHeader("Content-Type", "application/json");
-      http.sendHeader("Content-Length", jsonData.length());
-      http.print(jsonData);
-      http.endRequest();
- */
+  
       int statusCode = http.responseStatusCode();
       String response = http.responseBody();
 
