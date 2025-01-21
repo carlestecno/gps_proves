@@ -339,11 +339,19 @@ void setup()
     Serial.println(SMS_TARGET_ONE);
     Serial.println(SMS_TARGET_TWO);
     //String imei = modem.getIMEI();
-    //res_one = modem.sendSMS(SMS_TARGET_ONE, deviceName + " V:" +  String(battery_voltage));
-    //res_two = modem.sendSMS(SMS_TARGET_TWO, deviceName + " V:" +  String(battery_voltage));
-    res_one = true;
-    res_two = true;
-
+    res_one = modem.sendSMS(SMS_TARGET_ONE, deviceName + " V:" +  String(battery_voltage));
+    res_two = modem.sendSMS(SMS_TARGET_TWO, deviceName + " V:" +  String(battery_voltage));
+    /* if (res_one){
+      Serial.println("res_one: true");
+    } else {
+      Serial.println("res_two: false");
+    }
+    if (res_two){
+      Serial.println("res_two: true");
+    } else {
+      Serial.println("res_two: false");
+    } */
+    
     Serial.print("Send sms_one message ");
     Serial.println(res_one ? "OK" : "fail");
     Serial.print("Send sms_two message ");
@@ -510,7 +518,7 @@ void loop()
         Serial.print("rssi: " + String(rssi));
         if (rssi > 9 && rssi < 33){
           Serial.println("Bona senyal");
-          bool resPrimer = modem.sendSMS(SMS_TARGET_ONE, String("A5 atrapat - V: ") +  String(battery_voltage));
+          bool resPrimer = modem.sendSMS(SMS_TARGET_ONE, deviceName + " V:" + String(battery_voltage));
           if (resPrimer){
             Serial.println("sms enviat amb èxit");
             res_one = true;
@@ -529,7 +537,7 @@ void loop()
         Serial.print("rssi: " + String(rssi));
         if (rssi > 9 && rssi < 33){
           Serial.println("Bona senyal");
-          bool resSegon = modem.sendSMS(SMS_TARGET_TWO, String("A5 atrapat - V: ") +  String(battery_voltage));
+          bool resSegon = modem.sendSMS(SMS_TARGET_TWO, deviceName + " V:" + String(battery_voltage));
           if (resSegon){
             Serial.println("sms enviat amb èxit");
             res_two = true;

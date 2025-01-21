@@ -304,8 +304,8 @@ void setup()
     Serial.println(SMS_TARGET_ONE);
     Serial.println(SMS_TARGET_TWO);
     //String imei = modem.getIMEI();
-    //res_one = modem.sendSMS(SMS_TARGET_ONE, deviceName + " V:" +  String(battery_voltage));
-    //res_two = modem.sendSMS(SMS_TARGET_TWO, deviceName + " V:" +  String(battery_voltage));
+    res_one = modem.sendSMS(SMS_TARGET_ONE, deviceName + " V:" +  String(battery_voltage));
+    res_two = modem.sendSMS(SMS_TARGET_TWO, deviceName + " V:" +  String(battery_voltage));
     res_one = true;
     res_two = true;
 
